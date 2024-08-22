@@ -2,14 +2,16 @@ import inspect
 import sys
 
 from ioc.anotations.proxy.proxy_configurator import ProxyConfigurator
-from ioc.anotations.proxy.scheduled.kafka_listener.scheduled_kafka_listener import ScheduledKafkaListener
+from ioc.anotations.proxy.scheduled.kafka_listener.default_consumer import DefaultScheduledConsumer
+from ioc.application_context import ApplicationContext
+from ioc.kafka.kafka_conf import KafkaConf
 
 
 class KafkaListenerProxyConfigurator(ProxyConfigurator):
     def get_my_order(self) -> int:
         return sys.maxsize
 
-    def configure_if_needed(self, obj, application_context):
+    def configure_if_needed(self, obj, application_context: ApplicationContext):
         obj_class = obj.__class__
 
         methods = inspect.getmembers(obj_class, predicate=inspect.isfunction)
@@ -23,11 +25,13 @@ class KafkaListenerProxyConfigurator(ProxyConfigurator):
 
         for method_name, method in kafka_listener_methods:
             # Создаём объект ScheduledKafkaListener вместо добавления метода schedule в класс
-            scheduled_bean = ScheduledKafkaListener(
+            scheduled_bean = DefaultScheduledConsumer(
+                conf=application_context.get_bean(KafkaConf),
                 obj=obj,
                 method=method,
-                group_id=method.group_id,
-                topic_name=method.topic
+                topic=method.topic,
+                group_id=method.group_id
+
             )
             # Передаем объект в контекст или где он должен быть использован
             application_context.add_scheduled_bean(scheduled_bean)

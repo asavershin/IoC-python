@@ -1,5 +1,4 @@
 import logging
-import uuid
 from abc import abstractmethod
 from typing import Dict
 
@@ -7,6 +6,7 @@ from ioc.anotations.beans.component import Component
 from ioc.anotations.proxy.audit.audit import Audit
 from ioc.anotations.proxy.log.log import Log
 from ioc.anotations.proxy.scheduled.kafka_listener.kafka_listener import KafkaListener
+from ioc.kafka.consumers.consumer_record import ConsumerRecord
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -24,7 +24,7 @@ class Worker:
 
 class Listener:
     @abstractmethod
-    def listen(self, message):
+    def listen(self, message: ConsumerRecord):
         pass
 
 
@@ -32,10 +32,7 @@ class Listener:
 class NdviTiffWorker(Worker):
 
     def process(self, message):
-        try:
-            print(message)
-        except ValueError:
-            raise Exception(f"Invalid UUID for TIFF: {message}")
+        print(f"{self.get_my_key()} process {message}")
 
     def get_my_key(self) -> str:
         return "TIFF"
@@ -45,10 +42,7 @@ class NdviTiffWorker(Worker):
 class NdviBillWorker(Worker):
 
     def process(self, message):
-        try:
-            print()
-        except ValueError:
-            raise Exception(f"Invalid UUID for BILL: {message}")
+        print(f"{self.get_my_key()} process {message}")
 
     def get_my_key(self) -> str:
         return "BILL"
@@ -63,6 +57,5 @@ class NdviListener(Listener):
     @Audit()
     @Log()
     @KafkaListener("group", "TOPIC")
-    def listen(self, message):
-        self.workers.get(message).process(uuid.uuid4())
-
+    def listen(self, message: ConsumerRecord):
+        self.workers.get(message.get_key()).process(message.get_value())

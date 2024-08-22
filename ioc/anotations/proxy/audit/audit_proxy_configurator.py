@@ -4,7 +4,7 @@ import sys
 
 from ioc.anotations.proxy.proxy_configurator import ProxyConfigurator
 from ioc.common_logger import log
-from ioc.kafka.producer import Producer
+from ioc.kafka.producers.producer import Producer
 
 
 class AuditProxyConfigurator(ProxyConfigurator):
