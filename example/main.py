@@ -5,7 +5,7 @@ from ioc.application_context import ApplicationContext
 from ioc.common_logger import log
 
 if __name__ == '__main__':
-    context = ApplicationContext(["example.services"])
+    context = ApplicationContext(["example"])
     context.run()
     print(context._cache)
 

@@ -2,8 +2,8 @@ import logging
 from abc import abstractmethod
 from typing import Dict
 
+from example.audit.audit import Audit
 from ioc.anotations.beans.component import Component
-from ioc.anotations.proxy.audit.audit import Audit
 from ioc.anotations.proxy.log.log import Log
 from ioc.anotations.proxy.scheduled.kafka_listener.kafka_listener import KafkaListener
 from ioc.kafka.consumers.consumer_record import ConsumerRecord
@@ -54,7 +54,7 @@ class NdviListener(Listener):
     def __init__(self, workers: list[Worker]) -> None:
         self.workers: Dict[str, Worker] = {worker.get_my_key(): worker for worker in workers}
 
-    @Audit()
+    @Audit("audit")
     @Log()
     @KafkaListener("group", "TOPIC")
     def listen(self, message: ConsumerRecord):
