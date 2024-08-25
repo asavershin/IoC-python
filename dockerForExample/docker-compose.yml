@@ -1,0 +1,15 @@
+networks:
+  kafka-net:
+    name: kafka-net
+    driver: bridge
+
+services:
+  ioc-example:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: ioc-example
+    env_file:
+      - .env
+    networks:
+      - kafka-net
