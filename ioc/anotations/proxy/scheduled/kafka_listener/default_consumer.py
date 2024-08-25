@@ -30,12 +30,16 @@ class DefaultScheduledConsumer(Consumer, Scheduled):
     def schedule(self):
         record = self.consume()
         if record is not None:
-            self._method(self._obj, self.consume())
+            self._method(self._obj, record)
 
     def consume(self) -> Optional[ConsumerRecord]:
-        for message in self._consumer:
-            record = ConsumerRecord(
-                key=message.key,
-                value=message.value
-            )
-            return record
+        message = self._consumer.poll(timeout_ms=1000)
+
+        if message is None:
+            return None
+
+        for _, records in message.items():
+            for record in records:
+                return ConsumerRecord(key=record.key, value=record.value)
+
+        return None

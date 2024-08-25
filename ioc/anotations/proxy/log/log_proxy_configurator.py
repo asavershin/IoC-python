@@ -41,7 +41,10 @@ class LogProxyConfigurator(ProxyConfigurator):
             except Exception as e:
                 log.error(f"End method with error {class_name}.{method_name}. Exception: {e}")
                 raise e
-            log.info(f"End method {class_name}.{method_name} returned: {result}")
+            if result is not None:
+                log.info(f"End method {class_name}.{method_name} returned: {result}")
+            else:
+                log.info(f"End method {class_name}.{method_name}")
             return result
 
         return wrapped

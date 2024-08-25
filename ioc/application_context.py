@@ -85,11 +85,15 @@ class ApplicationContext:
     def add_scheduled_bean(self, bean):
         self._scheduled_beans.append(bean)
 
-    def get_scheduled_beans(self) -> list[Scheduled]:
-        return self._scheduled_beans
+    def _schedule(self):
+        while True:
+            for scheduled_bean in self._scheduled_beans:
+                scheduled_bean.schedule()
 
     def run(self):
         self._scan_for_components_and_configurators()
         for clazz in self._component_map.keys():
             if len(self._component_map.get(clazz)) == 1:
                 self.get_bean(clazz)
+
+        self._schedule()
