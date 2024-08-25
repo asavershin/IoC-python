@@ -11,7 +11,6 @@ class LogProxyConfigurator(ProxyConfigurator):
         return sys.maxsize - 200
 
     def configure_if_needed(self, obj, application_context):
-        # Получаем класс объекта
         obj_class = obj.__class__
 
         methods = inspect.getmembers(obj_class, predicate=inspect.isfunction)
@@ -22,14 +21,12 @@ class LogProxyConfigurator(ProxyConfigurator):
 
         for method_name, method in methods:
             if getattr(method, "_is_log", False):
-                # Используем отдельную функцию для создания замыкания
                 wrapped_method = self.create_wrapped_method(method_name, method)
                 setattr(obj_class, method_name, wrapped_method)
 
         return obj
 
     def create_wrapped_method(self, method_name, method):
-        """Функция для создания обёртки метода, чтобы захватить правильные переменные"""
 
         @functools.wraps(method)
         def wrapped(self, *args, **kwargs):

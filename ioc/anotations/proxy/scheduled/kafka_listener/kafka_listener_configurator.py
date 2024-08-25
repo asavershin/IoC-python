@@ -24,7 +24,6 @@ class KafkaListenerProxyConfigurator(ProxyConfigurator):
             return obj
 
         for method_name, method in kafka_listener_methods:
-            # Создаём объект ScheduledKafkaListener вместо добавления метода schedule в класс
             scheduled_bean = DefaultScheduledConsumer(
                 conf=application_context.get_bean(KafkaConf),
                 obj=obj,
@@ -33,7 +32,6 @@ class KafkaListenerProxyConfigurator(ProxyConfigurator):
                 group_id=method.group_id
 
             )
-            # Передаем объект в контекст или где он должен быть использован
             application_context.add_scheduled_bean(scheduled_bean)
 
         return obj
