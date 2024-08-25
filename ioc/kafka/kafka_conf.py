@@ -2,6 +2,7 @@ import os
 from abc import ABC, abstractmethod
 
 from ioc.anotations.beans.component import Component
+from ioc.common_logger import log
 
 
 class KafkaConf(ABC):
@@ -24,6 +25,7 @@ class DefaultKafkaConf(KafkaConf):
         self._KAFKA_USER = os.getenv('kafka.user')
         self._KAFKA_PASSWORD = os.getenv('kafka.password')
         self._KAFKA_BOOTSTRAP_SERVERS = os.getenv('kafka.bootstrap-servers')
+        log.info(f"DefaultKafkaConf start with {self._KAFKA_USER}|{self._KAFKA_PASSWORD}|{self._KAFKA_BOOTSTRAP_SERVERS}")
 
     def get_kafka_user(self) -> str:
         return self._KAFKA_USER

@@ -1,10 +1,6 @@
-class ConsumerRecord:
-    def __init__(self, key: str, value: str) -> None:
-        self._key = key
-        self._value = value
+from pydantic import BaseModel
 
-    def get_key(self) -> str:
-        return self._key
 
-    def get_value(self) -> str:
-        return self._value
+class ConsumerRecord(BaseModel):
+    key: str
+    value: str

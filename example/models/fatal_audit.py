@@ -1,9 +1,7 @@
-from dataclasses import dataclass
-from typing import Type
+from pydantic import BaseModel
 
 
-@dataclass(frozen=True)
-class FatalAudit:
+class FatalAudit(BaseModel):
     system: str
-    cause: Type[BaseException]
+    cause: str
     exceptionMessage: str

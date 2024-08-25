@@ -58,4 +58,4 @@ class NdviListener(Listener):
     @Log()
     @KafkaListener("group", "TOPIC")
     def listen(self, message: ConsumerRecord):
-        self.workers.get(message.get_key()).process(message.get_value())
+        self.workers.get(message.key).process(message.value)

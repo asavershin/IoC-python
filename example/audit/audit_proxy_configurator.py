@@ -1,8 +1,6 @@
 import functools
 import inspect
-import json
 import sys
-from typing import Any
 
 from example.models.audit_entity import AuditEntity
 from example.models.audit_with_result import AuditEntityWithResult
@@ -46,25 +44,50 @@ class AuditProxyConfigurator(ProxyConfigurator):
                 result = method(self, *args, **kwargs)
 
                 if result is None:
-                    _convert_and_produce(audit_topic, success, AuditEntity(system, self.__class__, method_name, args),
-                                         producer)
+                    producer.produce(
+                        audit_topic,
+                        success,
+                        AuditEntity(
+                            system=system,
+                            activeClass=str(self.__class__),
+                            activeMethod=str(method_name),
+                            params=args
+                        ).json()
+                    )
                 else:
-                    with_result = AuditEntityWithResult(system, self.__class__, method_name, args, str(result))
-                    _convert_and_produce(audit_topic, success, with_result, producer)
+                    with_result = AuditEntityWithResult(
+                        system=system,
+                        activeClass=str(self.__class__),
+                        activeMethod=method_name,
+                        params=args,
+                        result=str(result)
+                    )
+                    producer.produce(audit_topic, success, with_result.json())
 
                 return result
 
             except Exception as e:
                 try:
-                    error_audit = ErrorAudit(system, self.__class__, method_name, args, e.__class__, str(e))
-                    _convert_and_produce(audit_topic, error, error_audit, producer)
+                    error_audit = ErrorAudit(
+                        system=system,
+                        activeClass=str(self.__class__),
+                        activeMethod=method_name,
+                        params=args,
+                        cause=str(e.__class__),
+                        exceptionMessage=str(e)
+                    )
+                    producer.produce(audit_topic, error, error_audit.json())
                 except Exception as e:
-                    _convert_and_produce(audit_topic, error, FatalAudit(system, e.__class__, str(e)), producer)
+                    producer.produce(
+                        audit_topic,
+                        error,
+                        FatalAudit(
+                            system=system,
+                            cause=str(e.__class__),
+                            exceptionMessage=str(e)
+                        ).json()
+                    )
                     raise e
                 raise e
 
         return wrapped
-
-
-def _convert_and_produce(topic: str, status: str, to_json: Any, producer: Producer):
-    producer.produce(topic, status, json.dumps(to_json.__dict__))

@@ -1,10 +1,10 @@
-from dataclasses import dataclass
-from typing import Type, Any
+from typing import Any
+
+from pydantic import BaseModel
 
 
-@dataclass(frozen=True)
-class AuditEntity:
+class AuditEntity(BaseModel):
     system: str
-    activeClass: Type[Any]
+    activeClass: str
     activeMethod: str
     params: tuple[Any, ...]
