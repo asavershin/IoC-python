@@ -88,7 +88,10 @@ class ApplicationContext:
     def _schedule(self):
         while True:
             for scheduled_bean in self._scheduled_beans:
-                scheduled_bean.schedule()
+                try:
+                    scheduled_bean.schedule()
+                except Exception:
+                    log.error(f"Scheduling error {str(scheduled_bean.__class__)}")
 
     def run(self):
         self._scan_for_components_and_configurators()
