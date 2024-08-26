@@ -88,12 +88,18 @@ class ApplicationContext:
     def _schedule(self):
         while True:
             for scheduled_bean in self._scheduled_beans:
-                scheduled_bean.schedule()
+                try:
+                    scheduled_bean.schedule()
+                except Exception:
+                    log.error(f"Scheduling error {str(scheduled_bean.__class__)}")
 
     def run(self):
+        log.info("Run application context")
         self._scan_for_components_and_configurators()
         for clazz in self._component_map.keys():
             if len(self._component_map.get(clazz)) == 1:
-                self.get_bean(clazz)
+                log.info(f"Created bean: {self.get_bean(clazz)}")
+            else:
+                log.info(f"Created beans: {self.get_bean_list(clazz)}")
 
         self._schedule()

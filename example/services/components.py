@@ -54,7 +54,7 @@ class NdviListener(Listener):
     def __init__(self, workers: list[Worker]) -> None:
         self.workers: Dict[str, Worker] = {worker.get_my_key(): worker for worker in workers}
 
-    @Audit("audit")
+    @Audit("exampleSystem", "audit")
     @Log()
     @KafkaListener("group", "TOPIC")
     def listen(self, message: ConsumerRecord):

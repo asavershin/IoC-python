@@ -33,12 +33,12 @@ class AuditProxyConfigurator(ProxyConfigurator):
 
         producer: Producer = application_context.get_bean(Producer)
         audit_topic = method.audit_topic
+        system = method.system_name
         success = "SUCCESS"
         error = "ERROR"
 
         @functools.wraps(method)
         def wrapped(self, *args, **kwargs):
-            system = "exampleSystem"
 
             try:
                 result = method(self, *args, **kwargs)
